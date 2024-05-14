@@ -39,6 +39,19 @@ resource "ovh_cloud_project_user_s3_credential" "user_s3_credentials" {
   user_id      = ovh_cloud_project_user.user_s3.id
 }
 
+resource "ovh_cloud_project_user_s3_policy" "user_s3_policy" {
+  service_name = ovh_cloud_project_user.user_s3.service_name
+  user_id      = ovh_cloud_project_user.user_s3.id
+  policy       = jsonencode({
+    "Statement":[{
+      "Sid": "RWContainer",
+      "Effect": "Allow",
+      "Action":["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket", "s3:ListMultipartUploadParts", "s3:ListBucketMultipartUploads", "s3:AbortMultipartUpload", "s3:GetBucketLocation"],
+      "Resource":["arn:aws:s3:::${var.bucket_name}", "arn:aws:s3:::${var.bucket_name}/*"]
+    }]
+  })
+}
+
 resource "aws_s3_bucket" "b" {
   bucket = coalesce(var.bucket_name, var.ovh_public_cloud_project_id)
   tags                        = {}
