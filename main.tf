@@ -14,17 +14,7 @@ terraform {
     }
   }
 
-  backend "s3" {
-    bucket         = "s3-slow"
-    key            = "s3-terraform.tfstate"
-    region         = "rbx"
-    endpoints = {
-      s3 = "https://s3.rbx.io.cloud.ovh.net/"
-    }
-    skip_credentials_validation = true
-    skip_region_validation      = true
-    skip_requesting_account_id  = true
-    skip_s3_checksum            = true
+  backend "http" {
   }
 }
 
@@ -46,7 +36,7 @@ resource "ovh_cloud_project_user_s3_policy" "user_s3_policy" {
     "Statement":[{
       "Sid": "RWContainer",
       "Effect": "Allow",
-      "Action":["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket", "s3:ListMultipartUploadParts", "s3:ListBucketMultipartUploads", "s3:AbortMultipartUpload", "s3:GetBucketLocation"],
+      "Action":["s3:GetObject", "s3:PutObject", "s3:DeleteObject", "s3:ListBucket", "s3:ListMultipartUploadParts", "s3:ListBucketMultipartUploads", "s3:AbortMultipartUpload", "s3:GetBucketLocation", "s3:ListBucketVersions", "s3:GetBucketVersioning", "s3:PutBucketVersioning"],
       "Resource":["arn:aws:s3:::${var.bucket_name}", "arn:aws:s3:::${var.bucket_name}/*"]
     }]
   })
@@ -58,16 +48,16 @@ resource "aws_s3_bucket" "b" {
   tags_all                    = {}
 
   grant {
-      id          = ovh_cloud_project_user.user_s3.id
-      permissions = [
-          "FULL_CONTROL",
-      ]
-      type        = "CanonicalUser"
-      uri         = null
+    id          = ovh_cloud_project_user.user_s3.id
+    permissions = [
+        "FULL_CONTROL",
+    ]
+    type        = "CanonicalUser"
+    uri         = null
   }
 
   versioning {
-      enabled    = false
-      mfa_delete = false
+    enabled    = true
+    mfa_delete = false
   }
 }
