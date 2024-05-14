@@ -41,6 +41,11 @@ variable "os_tenant_id" {
   type        = string
 }
 
+variable "os_tenant_name" {
+  description = "OpenStack tenant/project name"
+  type        = string
+}
+
 variable "ovh_public_cloud_project_id" {
   type = string
 }
